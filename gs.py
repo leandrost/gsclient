@@ -3,6 +3,9 @@ import httplib
 import json
 import random
 
+#API DOCUMENTATION
+#http://developers.grooveshark.com/docs/public_api/v3/
+
 class Request(dict):
     def __init__(self, method):
         self.method = method
@@ -32,6 +35,10 @@ class Service(object):
         blob['parameters'] = req
         blob['header'] = header
 
+        print req.method
+        print req
+        print header
+
         conn = httplib.HTTPSConnection(self.endpoint_host)
         conn.connect()
         conn.request('POST',
@@ -39,6 +46,8 @@ class Service(object):
                      json.dumps(blob),
                      { 'Content-Type': 'application/json' })
         response = conn.getresponse().read()
+        print 'r'
+        print self.endpoint_path
         try:
             data = json.loads(response)
         except:
@@ -136,6 +145,13 @@ class WebClient(Client):
         req = Request('userGetPlaylists')
         req['userID'] = user_id
         return self._send(req)
+
+    def get_playlist_songs(self, playlist_id = None):
+      if not playlist_id:
+        print 'Must have playlist_id'
+      req = Request('getPlaylistSongs')
+      req['playlistID'] = str(playlist_id)
+      return self._send(req)
 
     def search(self, query, what):
         req = Request('getResultsFromSearch')

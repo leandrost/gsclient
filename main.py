@@ -99,7 +99,11 @@ class MainCmd(cmd.Cmd):
             print "No search results."
 
     def _select_playlist(self, pl):
-        print "I don't know what to do with playlists."
+        self._more = self._show_songs
+        self._results = self._client.get_playlist_songs(pl.playlist_id)
+        self._results_idx = 0
+        self._select = self._select_song
+        self.do_more(None)
 
     def _show_playlists(self, pls):
         i = self._results_idx + 1
@@ -114,6 +118,9 @@ class MainCmd(cmd.Cmd):
         self._results_idx = 0
         self._select = self._select_playlist
         self.do_more(None)
+
+    def do_playlist_songs(self, rest):
+        """Show user playlist songs."""
 
     def do_select(self, rest):
         """Select the given index from the last search results."""
@@ -130,7 +137,7 @@ class MainCmd(cmd.Cmd):
         (url, postdata) = self._client.get_stream(song)
         opener = urllib.URLopener()
         stream = opener.open(url, data = postdata)
-        command = ['mplayer', '-cache', '2048', '-']
+        command = ['mplayer', '-cache', '7168', '-']
         if (self._os == 'mac'):
             command = ['mpg123', '-']
         subprocess.call(command, stdin = stream)

@@ -22,10 +22,10 @@ class Song(object):
         self.title = title
 
 class Playlist(object):
-    def __init__(self, uuid, name, description):
+    def __init__(self, uuid, name, playlist_id):
         self._id = uuid
         self.name = name
-        self.description = description
+        self.playlist_id = playlist_id
 
 class ClientWrapper(object):
     def __init__(self, config = '~/.pygsclient'):
@@ -51,11 +51,15 @@ class ClientWrapper(object):
     def _munge_playlist(self, p):
         return Playlist(uuid = p['UUID'],
                         name = p['Name'],
-                        description = p['About'])
+                        playlist_id = p['PlaylistID'])
 
     def get_playlists(self):
         playlist_data = self._web.get_playlists()
         return [self._munge_playlist(x) for x in playlist_data['Playlists']]
+
+    def get_playlist_songs(self, playlist_id):
+        songs = self._web.get_playlist_songs(playlist_id)
+        return [self._munge_song(s) for s in songs]
 
     def get_stream(self, song):
         stream_data = self._player.get_stream(song._id)
